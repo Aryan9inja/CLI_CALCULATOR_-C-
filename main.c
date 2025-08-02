@@ -1,43 +1,40 @@
 #include <stdio.h>
+#include <string.h>
+
 #include "parser.h"
+#include "evaluator.h"
 
-const char* tokenTypeToString(TokenType type) {
-    switch (type) {
-    case TOKEN_NUMBER: return "NUMBER";
-    case TOKEN_PLUS: return "+";
-    case TOKEN_MINUS: return "-";
-    case TOKEN_MULTIPLY: return "*";
-    case TOKEN_DIVIDE: return "/";
-    case TOKEN_LPAREN: return "(";
-    case TOKEN_RPAREN: return ")";
-    case TOKEN_END: return "END";
-    default: return "UNKNOWN";
-    }
-}
-
-void printPostfix(TokenArray* postfix) {
-    printf("Postfix expression:\n");
-    for (int i = 0; i < postfix->size; ++i) {
-        Token tok = postfix->tokens[i];
-        if (tok.type == TOKEN_NUMBER)
-            printf("%.2f ", tok.value);
-        else
-            printf("%s ", tokenTypeToString(tok.type));
-    }
-    printf("\n");
-}
+#define MAX_INPUT_SIZE 256
 
 int main() {
-    char expression[20];
-    printf("Enter an expression");
-    fgets(expression,sizeof(expression),stdin);
+    char input[MAX_INPUT_SIZE];
 
-    printf("Infix expression: %s\n", expression);
+    printf("Welcome to CLI Calculator\n");
+    printf("Enter 'exit' to quit\n");
 
-    TokenArray* postfix = infixToPostfix(expression);
-    printPostfix(postfix);
+    while (1) {
+        printf("Enter an expression: ");
+        if (!fgets(input, sizeof(input), stdin)) {
+            printf("Input error, exiting...\n");
+            break;
+        }
 
-    freeTokenArray(postfix);
+        size_t len = strlen(input);
+        if (len > 0 && input[len - 1] == '\n') input[len - 1] = '\0';
+
+        if (strcmp(input, "exit") == 0) break;
+
+        TokenArray* postfix = infixToPostfix(input);
+        if (!postfix || postfix->size == 0) {
+            fprintf(stderr, "Failed to parse expression.\n");
+            continue;
+        }
+        double result=evaluatePostfix(postfix);
+        printf("Result: %.2lf\n",result);
+
+        freeTokenArray(postfix);
+    }
+
+    printf("Goodbye :)\n");
     return 0;
 }
-

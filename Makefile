@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -std=c99 -g
 
 TARGET = calculator
 
-SRCS = main.c token_stack.c tokenizer.c parser.c
+SRCS = main.c token_stack.c tokenizer.c parser.c stack.c evaluator.c
 OBJS = $(SRCS:.c=.o)
 
 all:$(TARGET)
